@@ -1,0 +1,214 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "User Message",
+        "type": "webhook",
+        "config": {
+          "path": "/chat",
+          "method": "POST"
+        }
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "code",
+      "data": {
+        "label": "Message Preprocessing",
+        "type": "javascript",
+        "config": {
+          "code": "// Extract user message and context\nconst userMessage = $input.message;\nconst userId = $input.userId;\nconst sessionId = $input.sessionId || Math.random().toString(36).substring(2, 15);\n\n// Format for next steps\nreturn {\n  userMessage,\n  userId,\n  sessionId,\n  timestamp: new Date().toISOString()\n};"
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 200
+      },
+      "width": 245,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "action",
+      "data": {
+        "label": "Retrieve Chat History",
+        "type": "database",
+        "config": {
+          "operation": "query",
+          "query": "SELECT * FROM chat_history WHERE session_id = {{$node['Message Preprocessing'].json.sessionId}} ORDER BY timestamp DESC LIMIT 10"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 200
+      },
+      "width": 223,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 200
+      }
+    },
+    {
+      "id": "4",
+      "type": "code",
+      "data": {
+        "label": "Format Context",
+        "type": "javascript",
+        "config": {
+          "code": "// Format chat history and system instructions\nconst chatHistory = $node['Retrieve Chat History'].json || [];\n\n// Create conversation context\nconst messages = [\n  {\n    role: 'system',\n    content: 'You are a helpful assistant with expertise in [SPECIFIC DOMAIN]. Provide accurate and concise information.'\n  }\n];\n\n// Add chat history\nchatHistory.reverse().forEach(msg => {\n  messages.push({\n    role: msg.is_user ? 'user' : 'assistant',\n    content: msg.message\n  });\n});\n\n// Add current message\nmessages.push({\n  role: 'user',\n  content: $node['Message Preprocessing'].json.userMessage\n});\n\nreturn { messages };"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 200
+      },
+      "width": 185,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 200
+      }
+    },
+    {
+      "id": "5",
+      "type": "ai",
+      "data": {
+        "label": "ChatGPT Request",
+        "type": "ai-completion",
+        "config": {
+          "model": "gpt-4",
+          "messages": "{{$node['Format Context'].json.messages}}",
+          "temperature": 0.7,
+          "max_tokens": 500
+        }
+      },
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "width": 196,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 1100,
+        "y": 200
+      }
+    },
+    {
+      "id": "6",
+      "type": "action",
+      "data": {
+        "label": "Save to History",
+        "type": "database",
+        "config": {
+          "operation": "insert",
+          "table": "chat_history",
+          "data": "{\n  \"session_id\": \"{{$node['Message Preprocessing'].json.sessionId}}\",\n  \"user_id\": \"{{$node['Message Preprocessing'].json.userId}}\",\n  \"message\": \"{{$node['ChatGPT Request'].json.choices[0].message.content}}\",\n  \"is_user\": false,\n  \"timestamp\": \"{{$node['Message Preprocessing'].json.timestamp}}\"\n}"
+        }
+      },
+      "position": {
+        "x": 1350,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1350,
+        "y": 200
+      }
+    },
+    {
+      "id": "7",
+      "type": "action",
+      "data": {
+        "label": "Send Response",
+        "type": "http",
+        "config": {
+          "status": 200,
+          "body": "{\n  \"response\": \"{{$node['ChatGPT Request'].json.choices[0].message.content}}\",\n  \"sessionId\": \"{{$node['Message Preprocessing'].json.sessionId}}\"\n}"
+        }
+      },
+      "position": {
+        "x": 1600,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1600,
+        "y": 200
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e4-5",
+      "source": "4",
+      "target": "5",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e5-6",
+      "source": "5",
+      "target": "6",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e6-7",
+      "source": "6",
+      "target": "7",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -150.97859023687812,
+    "y": 56.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}

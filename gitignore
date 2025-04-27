@@ -1,0 +1,6 @@
+__pycache__
+.env
+.env.testing
+sandbox/dump
+static/voices/*
+RAG/ragtest/.env

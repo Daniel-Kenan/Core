@@ -1,0 +1,159 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "Webhook",
+        "type": "webhook",
+        "config": {
+          "path": "/new-customer",
+          "method": "POST"
+        }
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "logic",
+      "data": {
+        "label": "Validate Data",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"Webhook\"].json[\"email\"] && $node[\"Webhook\"].json[\"name\"]}}"
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "action",
+      "data": {
+        "label": "Create Account",
+        "type": "database",
+        "config": {
+          "operation": "insert",
+          "table": "customers"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 100
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 100
+      }
+    },
+    {
+      "id": "4",
+      "type": "action",
+      "data": {
+        "label": "Send Welcome Email",
+        "type": "email",
+        "config": {
+          "to": "{{$node[\"Webhook\"].json[\"email\"]}}",
+          "subject": "Welcome to Our Service!",
+          "body": "{{$node[\"Webhook\"].json[\"name\"]}}, thank you for signing up!"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 100
+      },
+      "width": 221,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 100
+      }
+    },
+    {
+      "id": "5",
+      "type": "action",
+      "data": {
+        "label": "Send Error Response",
+        "type": "http",
+        "config": {
+          "status": 400,
+          "body": "{\"error\": \"Invalid data\"}"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 300
+      },
+      "width": 222,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 300
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "valid",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-5",
+      "source": "2",
+      "target": "5",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "invalid",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -8.97859023687812,
+    "y": 59.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}

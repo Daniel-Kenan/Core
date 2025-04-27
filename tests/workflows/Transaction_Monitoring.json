@@ -1,0 +1,187 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "New Transaction",
+        "type": "webhook",
+        "config": {
+          "path": "/transaction",
+          "method": "POST"
+        }
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 190,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "code",
+      "data": {
+        "label": "Risk Analysis",
+        "type": "javascript",
+        "config": {
+          "code": "// Calculate risk score\nconst amount = $input.amount;\nconst country = $input.country;\nlet riskScore = 0;\n\nif (amount > 10000) riskScore += 50;\nif (country === 'high-risk') riskScore += 50;\n\nreturn { riskScore };"
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 200
+      },
+      "width": 185,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "logic",
+      "data": {
+        "label": "High Risk?",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"Risk Analysis\"].json[\"riskScore\"] > 70}}"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 200
+      }
+    },
+    {
+      "id": "4",
+      "type": "action",
+      "data": {
+        "label": "Flag Transaction",
+        "type": "database",
+        "config": {
+          "operation": "update",
+          "table": "transactions"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 100
+      },
+      "width": 188,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 100
+      }
+    },
+    {
+      "id": "5",
+      "type": "action",
+      "data": {
+        "label": "Send Alert",
+        "type": "email",
+        "config": {
+          "to": "security@example.com",
+          "subject": "High Risk Transaction Detected"
+        }
+      },
+      "position": {
+        "x": 1100,
+        "y": 100
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1100,
+        "y": 100
+      }
+    },
+    {
+      "id": "6",
+      "type": "action",
+      "data": {
+        "label": "Log Transaction",
+        "type": "database",
+        "config": {
+          "operation": "insert",
+          "table": "transaction_logs"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 300
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 300
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "high risk",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e4-5",
+      "source": "4",
+      "target": "5",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-6",
+      "source": "3",
+      "target": "6",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "normal",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -8.97859023687812,
+    "y": 59.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "action",
+      "position": {
+        "x": 177.3693182003716,
+        "y": 169.60914227290826
+      },
+      "data": {
+        "label": "HTTP Request",
+        "type": "http",
+        "config": {
+          "url": "https://api.github.com",
+          "method": "POST"
+        }
+      },
+      "width": 185,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 177.3693182003716,
+        "y": 169.60914227290826
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [],
+  "viewport": {
+    "x": 109.68213334375906,
+    "y": -77.53489641224334,
+    "zoom": 1.1575726215753745
+  }
+}

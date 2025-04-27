@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "code",
+      "position": {
+        "x": 307.3648754530765,
+        "y": 144.70997133484272
+      },
+      "data": {
+        "label": "Python",
+        "type": "python",
+        "config": {
+          "code": "print(\"hello world\")"
+        }
+      },
+      "width": 185,
+      "height": 99,
+      "selected": true,
+      "positionAbsolute": {
+        "x": 307.3648754530765,
+        "y": 144.70997133484272
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [],
+  "viewport": {
+    "x": 136.185087507133,
+    "y": 73.60869351449264,
+    "zoom": 0.6370764135108891
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "Chat Message",
+        "type": "chat",
+        "config": {}
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "ai",
+      "data": {
+        "label": "Classify Query",
+        "type": "ai-agent",
+        "config": {
+          "model": "gpt-3.5-turbo",
+          "systemPrompt": "Classify if this query requires search or can be answered directly."
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 200
+      },
+      "width": 185,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "logic",
+      "data": {
+        "label": "Needs Search?",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"Classify Query\"].json[\"needsSearch\"] === true}}"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 200
+      }
+    },
+    {
+      "id": "4",
+      "type": "action",
+      "data": {
+        "label": "Search",
+        "type": "http",
+        "config": {
+          "url": "https://api.search.com",
+          "method": "GET"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 100
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 100
+      }
+    },
+    {
+      "id": "5",
+      "type": "ai",
+      "data": {
+        "label": "Generate Response",
+        "type": "ai-agent",
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "Generate a response based on the search results."
+        }
+      },
+      "position": {
+        "x": 1100,
+        "y": 100
+      },
+      "width": 211,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 1100,
+        "y": 100
+      }
+    },
+    {
+      "id": "6",
+      "type": "ai",
+      "data": {
+        "label": "Direct Response",
+        "type": "ai-agent",
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "Answer the user's question directly."
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 300
+      },
+      "width": 186,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 300
+      }
+    },
+    {
+      "id": "7",
+      "type": "message",
+      "data": {
+        "label": "Send Response",
+        "type": "message",
+        "config": {
+          "channel": "reply"
+        }
+      },
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1100,
+        "y": 200
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "yes",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e4-5",
+      "source": "4",
+      "target": "5",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e5-7",
+      "source": "5",
+      "target": "7",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-6",
+      "source": "3",
+      "target": "6",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "no",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e6-7",
+      "source": "6",
+      "target": "7",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -8.97859023687812,
+    "y": 59.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}

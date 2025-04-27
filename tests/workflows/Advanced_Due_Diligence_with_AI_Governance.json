@@ -1,0 +1,536 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "New Entity Check",
+        "type": "webhook",
+        "config": {
+          "path": "/due-diligence",
+          "method": "POST"
+        }
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 197,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "action",
+      "data": {
+        "label": "Identity Verification",
+        "type": "http",
+        "config": {
+          "url": "https://api.identity-verify.com/check",
+          "method": "POST"
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 100
+      },
+      "width": 210,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 100
+      }
+    },
+    {
+      "id": "3",
+      "type": "action",
+      "data": {
+        "label": "Document Retrieval",
+        "type": "database",
+        "config": {
+          "operation": "query",
+          "query": "SELECT * FROM entity_documents WHERE entity_id = {{$input.entityId}}"
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 300
+      },
+      "width": 210,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 300
+      }
+    },
+    {
+      "id": "4",
+      "type": "ai",
+      "data": {
+        "label": "RAG Document Analysis",
+        "subtitle": "Retrieval Augmented Generation",
+        "type": "ai-rag",
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "Analyze the provided documents for risk factors, compliance issues, and key information about the entity.",
+          "documents": "{{$node['Document Retrieval'].json}}",
+          "retrieverType": "hybrid",
+          "embeddingModel": "text-embedding-3-large"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 300
+      },
+      "width": 246,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 300
+      }
+    },
+    {
+      "id": "5",
+      "type": "action",
+      "data": {
+        "label": "Regulatory Database Search",
+        "type": "http",
+        "config": {
+          "url": "https://api.regulatory-database.com/search",
+          "method": "POST",
+          "body": "{\"entityName\": \"{{$input.entityName}}\", \"jurisdiction\": \"{{$input.jurisdiction}}\"}"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 100
+      },
+      "width": 278,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 100
+      }
+    },
+    {
+      "id": "6",
+      "type": "ai",
+      "data": {
+        "label": "MCP Risk Analysis",
+        "subtitle": "Multi-Context Processing",
+        "type": "ai-mcp",
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "Analyze multiple data sources to identify risks, connections, and compliance issues.",
+          "contexts": [
+            {
+              "name": "identity",
+              "data": "{{$node['Identity Verification'].json}}"
+            },
+            {
+              "name": "regulatory",
+              "data": "{{$node['Regulatory Database Search'].json}}"
+            },
+            {
+              "name": "documents",
+              "data": "{{$node['RAG Document Analysis'].json}}"
+            }
+          ]
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 200
+      },
+      "width": 203,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 200
+      }
+    },
+    {
+      "id": "7",
+      "type": "code",
+      "data": {
+        "label": "Risk Score Calculation",
+        "type": "javascript",
+        "config": {
+          "code": "// Calculate comprehensive risk score\nconst mcpResults = $node['MCP Risk Analysis'].json;\nconst identityVerification = $node['Identity Verification'].json;\nconst regulatoryResults = $node['Regulatory Database Search'].json;\n\nlet riskScore = 0;\nlet riskFactors = [];\n\n// Identity verification risks\nif (!identityVerification.verified) {\n  riskScore += 50;\n  riskFactors.push('Identity verification failed');\n}\n\n// Regulatory database risks\nif (regulatoryResults.sanctions && regulatoryResults.sanctions.length > 0) {\n  riskScore += 100;\n  riskFactors.push(`${regulatoryResults.sanctions.length} sanctions found`);\n}\n\nif (regulatoryResults.pep) {\n  riskScore += 75;\n  riskFactors.push('Politically Exposed Person');\n}\n\n// MCP identified risks\nif (mcpResults.identifiedRisks) {\n  mcpResults.identifiedRisks.forEach(risk => {\n    riskScore += risk.severity * 25;\n    riskFactors.push(risk.description);\n  });\n}\n\nconst riskLevel = riskScore > 100 ? 'high' : riskScore > 50 ? 'medium' : 'low';\n\nreturn {\n  riskScore,\n  riskLevel,\n  riskFactors,\n  detailedAnalysis: mcpResults.analysis,\n  entityData: {\n    name: $input.entityName,\n    jurisdiction: $input.jurisdiction,\n    identityVerified: identityVerification.verified\n  }\n};"
+        }
+      },
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "width": 231,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 1100,
+        "y": 200
+      }
+    },
+    {
+      "id": "8",
+      "type": "ai",
+      "data": {
+        "label": "Generate Due Diligence Report",
+        "type": "ai-agent",
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "Generate a comprehensive due diligence report based on the analysis results. Include risk factors, compliance issues, and recommendations.",
+          "input": "{{$node['Risk Score Calculation'].json}}"
+        }
+      },
+      "position": {
+        "x": 1350,
+        "y": 200
+      },
+      "width": 297,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 1350,
+        "y": 200
+      }
+    },
+    {
+      "id": "9",
+      "type": "ai",
+      "data": {
+        "label": "Governance AI Check",
+        "subtitle": "Compliance & Bias Detection",
+        "type": "ai-governance",
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "You are a governance AI that checks for sensitive information exposure, bias, and compliance issues in AI-generated content. Flag any issues found.",
+          "content": "{{$node['Generate Due Diligence Report'].json.content}}",
+          "sensitiveDataTypes": [
+            "PII",
+            "Financial",
+            "Legal"
+          ],
+          "biasCategories": [
+            "Gender",
+            "Race",
+            "Age",
+            "Geographic"
+          ],
+          "complianceFrameworks": [
+            "GDPR",
+            "CCPA",
+            "AML",
+            "KYC"
+          ]
+        }
+      },
+      "position": {
+        "x": 1600,
+        "y": 200
+      },
+      "width": 227,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 1600,
+        "y": 200
+      }
+    },
+    {
+      "id": "10",
+      "type": "logic",
+      "data": {
+        "label": "Issues Detected?",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"Governance AI Check\"].json[\"issuesDetected\"] === true}}"
+        }
+      },
+      "position": {
+        "x": 1850,
+        "y": 200
+      },
+      "width": 192,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1850,
+        "y": 200
+      }
+    },
+    {
+      "id": "11",
+      "type": "ai",
+      "data": {
+        "label": "Remediate Issues",
+        "type": "ai-agent",
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "Remediate the identified issues in the report while maintaining accuracy and completeness. Remove sensitive information, correct bias, and ensure compliance.",
+          "input": {
+            "originalReport": "{{$node['Generate Due Diligence Report'].json.content}}",
+            "issues": "{{$node['Governance AI Check'].json.issues}}",
+            "entityData": "{{$node['Risk Score Calculation'].json.entityData}}"
+          }
+        }
+      },
+      "position": {
+        "x": 2100,
+        "y": 100
+      },
+      "width": 195,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 2100,
+        "y": 100
+      }
+    },
+    {
+      "id": "12",
+      "type": "action",
+      "data": {
+        "label": "Store Final Report",
+        "type": "database",
+        "config": {
+          "operation": "insert",
+          "table": "due_diligence_reports",
+          "data": "{\n  \"entityId\": \"{{$input.entityId}}\",\n  \"entityName\": \"{{$input.entityName}}\",\n  \"reportContent\": \"{{$node['Remediate Issues'].json.remediatedReport || $node['Generate Due Diligence Report'].json.content}}\",\n  \"riskLevel\": \"{{$node['Risk Score Calculation'].json.riskLevel}}\",\n  \"riskScore\": \"{{$node['Risk Score Calculation'].json.riskScore}}\",\n  \"timestamp\": \"{{$now}}\",\n  \"governanceChecked\": true,\n  \"issuesRemediated\": {{$node[\"Governance AI Check\"].json[\"issuesDetected\"]}}\n}"
+        }
+      },
+      "position": {
+        "x": 2350,
+        "y": 200
+      },
+      "width": 197,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 2350,
+        "y": 200
+      }
+    },
+    {
+      "id": "13",
+      "type": "logic",
+      "data": {
+        "label": "High Risk?",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"Risk Score Calculation\"].json[\"riskLevel\"] === \"high\"}}"
+        }
+      },
+      "position": {
+        "x": 2600,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 2600,
+        "y": 200
+      }
+    },
+    {
+      "id": "14",
+      "type": "action",
+      "data": {
+        "label": "Alert Compliance Team",
+        "type": "email",
+        "config": {
+          "to": "compliance@company.com",
+          "subject": "High Risk Entity Detected - {{$input.entityName}}",
+          "body": "A high risk entity has been detected in the due diligence process. Risk score: {{$node['Risk Score Calculation'].json.riskScore}}. Please review the report.",
+          "attachments": [
+            "{{$node['Store Final Report'].json.reportId}}"
+          ]
+        }
+      },
+      "position": {
+        "x": 2850,
+        "y": 100
+      },
+      "width": 239,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 2850,
+        "y": 100
+      }
+    },
+    {
+      "id": "15",
+      "type": "action",
+      "data": {
+        "label": "Return Report",
+        "type": "http",
+        "config": {
+          "status": 200,
+          "body": "{\n  \"reportId\": \"{{$node['Store Final Report'].json.reportId}}\",\n  \"entityName\": \"{{$input.entityName}}\",\n  \"riskLevel\": \"{{$node['Risk Score Calculation'].json.riskLevel}}\",\n  \"riskScore\": \"{{$node['Risk Score Calculation'].json.riskScore}}\",\n  \"summary\": \"{{$node['Risk Score Calculation'].json.riskFactors}}\"\n}"
+        }
+      },
+      "position": {
+        "x": 2850,
+        "y": 300
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 2850,
+        "y": 300
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e1-3",
+      "source": "1",
+      "target": "3",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-5",
+      "source": "2",
+      "target": "5",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e4-6",
+      "source": "4",
+      "target": "6",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e5-6",
+      "source": "5",
+      "target": "6",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e6-7",
+      "source": "6",
+      "target": "7",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e7-8",
+      "source": "7",
+      "target": "8",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e8-9",
+      "source": "8",
+      "target": "9",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e9-10",
+      "source": "9",
+      "target": "10",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e10-11",
+      "source": "10",
+      "target": "11",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "issues found",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e11-12",
+      "source": "11",
+      "target": "12",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e10-12",
+      "source": "10",
+      "target": "12",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "no issues",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e12-13",
+      "source": "12",
+      "target": "13",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e13-14",
+      "source": "13",
+      "target": "14",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "high risk",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e14-15",
+      "source": "14",
+      "target": "15",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e13-15",
+      "source": "13",
+      "target": "15",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "medium/low risk",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -150.97859023687812,
+    "y": 56.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}

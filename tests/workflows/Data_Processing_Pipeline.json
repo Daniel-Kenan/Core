@@ -1,0 +1,123 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "Schedule",
+        "type": "schedule",
+        "config": {
+          "frequency": "daily",
+          "time": "08:00"
+        }
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "action",
+      "data": {
+        "label": "Google Sheets",
+        "type": "googlesheets",
+        "config": {
+          "operation": "read",
+          "spreadsheetId": "",
+          "range": "Sheet1!A1:D100"
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "code",
+      "data": {
+        "label": "Process Data",
+        "type": "javascript",
+        "config": {
+          "code": "// Process the data\nreturn { processedData: $input.data.map(row => ({ name: row[0], value: parseInt(row[1]) })) }"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 200
+      },
+      "width": 185,
+      "height": 99,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 200
+      }
+    },
+    {
+      "id": "4",
+      "type": "action",
+      "data": {
+        "label": "Database",
+        "type": "database",
+        "config": {
+          "operation": "insert",
+          "table": "processed_data"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 200
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -8.97859023687812,
+    "y": 59.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}

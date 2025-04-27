@@ -1,0 +1,276 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "When chat message received",
+        "type": "chat",
+        "config": {}
+      },
+      "position": {
+        "x": 31.660652323899285,
+        "y": 163.95469798657717
+      },
+      "width": 287,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 31.660652323899285,
+        "y": 163.95469798657717
+      },
+      "dragging": false
+    },
+    {
+      "id": "2",
+      "type": "ai",
+      "data": {
+        "label": "AI Agent",
+        "subtitle": "Tools Agent",
+        "type": "ai-agent",
+        "tools": [
+          "Chat Model",
+          "Memory",
+          "Tools"
+        ],
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "You are a helpful assistant."
+        }
+      },
+      "position": {
+        "x": 391.9899328859061,
+        "y": 226.03271812080533
+      },
+      "width": 248,
+      "height": 129,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 391.9899328859061,
+        "y": 226.03271812080533
+      },
+      "dragging": false
+    },
+    {
+      "id": "3",
+      "type": "logic",
+      "data": {
+        "label": "If",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"AI Agent\"].json[\"success\"] === true}}"
+        }
+      },
+      "position": {
+        "x": 745.8806120296069,
+        "y": 149.91610528586324
+      },
+      "width": 185,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 745.8806120296069,
+        "y": 149.91610528586324
+      },
+      "dragging": false
+    },
+    {
+      "id": "4",
+      "type": "message",
+      "data": {
+        "label": "Success",
+        "type": "message",
+        "config": {
+          "message": "{{$node[\"AI Agent\"].json[\"response\"]}}"
+        }
+      },
+      "position": {
+        "x": 1039.982277954293,
+        "y": 338.78757424073206
+      },
+      "width": 185,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1039.982277954293,
+        "y": 338.78757424073206
+      },
+      "dragging": false
+    },
+    {
+      "id": "5",
+      "type": "message",
+      "data": {
+        "label": "Failure",
+        "type": "message",
+        "config": {
+          "message": "Sorry, I couldn't process your request."
+        }
+      },
+      "position": {
+        "x": 1029.0364932885907,
+        "y": 237.92197986577185
+      },
+      "width": 185,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1029.0364932885907,
+        "y": 237.92197986577185
+      },
+      "dragging": false
+    },
+    {
+      "id": "6",
+      "type": "code",
+      "data": {
+        "label": "Python",
+        "type": "python",
+        "config": {
+          "code": "print(\"hello world\")"
+        }
+      },
+      "position": {
+        "x": 884.9242888900324,
+        "y": 448.7058028985882
+      },
+      "width": 185,
+      "height": 99,
+      "selected": true,
+      "positionAbsolute": {
+        "x": 884.9242888900324,
+        "y": 448.7058028985882
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "className": "green",
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "selected": false,
+      "style": {},
+      "animated": true,
+      "type": "default",
+      "label": "",
+      "labelStyle": {},
+      "labelShowBg": true,
+      "labelBgStyle": {},
+      "labelBgPadding": [
+        2,
+        4
+      ],
+      "labelBgBorderRadius": 4,
+      "hideArrowhead": false
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "className": "ai",
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "selected": false,
+      "style": {},
+      "animated": true,
+      "type": "default",
+      "label": "",
+      "labelStyle": {},
+      "labelShowBg": true,
+      "labelBgStyle": {},
+      "labelBgPadding": [
+        2,
+        4
+      ],
+      "labelBgBorderRadius": 4,
+      "hideArrowhead": false
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "true",
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "selected": false,
+      "style": {},
+      "animated": true,
+      "type": "default",
+      "labelStyle": {},
+      "labelShowBg": true,
+      "labelBgStyle": {},
+      "labelBgPadding": [
+        2,
+        4
+      ],
+      "labelBgBorderRadius": 4,
+      "hideArrowhead": false
+    },
+    {
+      "id": "e3-5",
+      "source": "3",
+      "target": "5",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "false",
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "selected": false,
+      "style": {},
+      "animated": true,
+      "type": "default",
+      "labelStyle": {},
+      "labelShowBg": true,
+      "labelBgStyle": {},
+      "labelBgPadding": [
+        2,
+        4
+      ],
+      "labelBgBorderRadius": 4,
+      "hideArrowhead": false
+    },
+    {
+      "source": "3",
+      "sourceHandle": "true",
+      "target": "6",
+      "targetHandle": null,
+      "type": "smoothstep",
+      "animated": true,
+      "data": {
+        "hideArrowhead": false
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "id": "reactflow__edge-3true-6",
+      "selected": false,
+      "style": {},
+      "className": "",
+      "label": "",
+      "labelStyle": {},
+      "labelShowBg": true,
+      "labelBgStyle": {},
+      "labelBgPadding": [
+        2,
+        4
+      ],
+      "labelBgBorderRadius": 4,
+      "hideArrowhead": false
+    }
+  ],
+  "viewport": {
+    "x": -291.8019599672168,
+    "y": -125.33257368322035,
+    "zoom": 0.9370469517502434
+  }
+}

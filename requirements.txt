@@ -1,0 +1,7 @@
+nltk==3.8.1
+websockets==10.4
+gunicorn
+flask_socketio
+flask_cors
+flask_mail
+pymongo

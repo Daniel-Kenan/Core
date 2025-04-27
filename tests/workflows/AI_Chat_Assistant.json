@@ -1,0 +1,161 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "When chat message received",
+        "type": "chat",
+        "config": {}
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 287,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "ai",
+      "data": {
+        "label": "AI Agent",
+        "subtitle": "Tools Agent",
+        "type": "ai-agent",
+        "tools": [
+          "Chat Model",
+          "Memory",
+          "Tools"
+        ],
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "You are a helpful assistant."
+        }
+      },
+      "position": {
+        "x": 400,
+        "y": 200
+      },
+      "width": 248,
+      "height": 129,
+      "positionAbsolute": {
+        "x": 400,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "logic",
+      "data": {
+        "label": "If",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"AI Agent\"].json[\"success\"] === true}}"
+        }
+      },
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 700,
+        "y": 200
+      }
+    },
+    {
+      "id": "4",
+      "type": "message",
+      "data": {
+        "label": "Success",
+        "type": "message",
+        "config": {
+          "message": "{{$node[\"AI Agent\"].json[\"response\"]}}"
+        }
+      },
+      "position": {
+        "x": 1000,
+        "y": 100
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1000,
+        "y": 100
+      }
+    },
+    {
+      "id": "5",
+      "type": "message",
+      "data": {
+        "label": "Failure",
+        "type": "message",
+        "config": {
+          "message": "Sorry, I couldn't process your request."
+        }
+      },
+      "position": {
+        "x": 1000,
+        "y": 300
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1000,
+        "y": 300
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "className": "green",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "className": "ai",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "true",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-5",
+      "source": "3",
+      "target": "5",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "false",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -8.97859023687812,
+    "y": 59.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "When chat message received",
+        "type": "chat",
+        "config": {}
+      },
+      "position": {
+        "x": 74.88527331937314,
+        "y": 258.0778054489496
+      },
+      "width": 287,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 74.88527331937314,
+        "y": 258.0778054489496
+      },
+      "dragging": false
+    },
+    {
+      "id": "2",
+      "type": "ai",
+      "data": {
+        "label": "AI Agent",
+        "subtitle": "Tools Agent",
+        "type": "ai-agent",
+        "tools": [
+          "Chat Model",
+          "Memory",
+          "Tools"
+        ],
+        "config": {
+          "model": "gpt-4",
+          "systemPrompt": "You are a helpful assistant."
+        }
+      },
+      "position": {
+        "x": 400,
+        "y": 200
+      },
+      "width": 248,
+      "height": 129,
+      "positionAbsolute": {
+        "x": 400,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "logic",
+      "data": {
+        "label": "If",
+        "type": "if",
+        "config": {
+          "condition": "{{$node[\"AI Agent\"].json[\"success\"] === true}}"
+        }
+      },
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "width": 185,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 700,
+        "y": 200
+      }
+    },
+    {
+      "id": "4",
+      "type": "message",
+      "data": {
+        "label": "Success",
+        "type": "message",
+        "config": {
+          "message": "{{$node[\"AI Agent\"].json[\"response\"]}}"
+        }
+      },
+      "position": {
+        "x": 921.5164791230409,
+        "y": 495.5569452198731
+      },
+      "width": 185,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 921.5164791230409,
+        "y": 495.5569452198731
+      },
+      "dragging": false
+    },
+    {
+      "id": "5",
+      "type": "message",
+      "data": {
+        "label": "Failure",
+        "type": "message",
+        "config": {
+          "message": "Sorry, I couldn't process your request."
+        }
+      },
+      "position": {
+        "x": 923.0861495405802,
+        "y": 325.1147266806268
+      },
+      "width": 185,
+      "height": 70,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 923.0861495405802,
+        "y": 325.1147266806268
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "className": "green",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "className": "ai",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "sourceHandle": "true",
+      "className": "condition-true",
+      "label": "true",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-5",
+      "source": "3",
+      "target": "5",
+      "sourceHandle": "false",
+      "className": "condition-false",
+      "label": "false",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": 136.18508750713295,
+    "y": 73.60869351449264,
+    "zoom": 0.6370764135108891
+  }
+}

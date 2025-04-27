@@ -1,0 +1,327 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "trigger",
+      "data": {
+        "label": "New Employee Form",
+        "type": "form",
+        "config": {
+          "fields": [
+            {
+              "name": "fullName",
+              "type": "text",
+              "required": true
+            },
+            {
+              "name": "email",
+              "type": "email",
+              "required": true
+            },
+            {
+              "name": "position",
+              "type": "text",
+              "required": true
+            },
+            {
+              "name": "startDate",
+              "type": "date",
+              "required": true
+            },
+            {
+              "name": "department",
+              "type": "select",
+              "options": [
+                "Engineering",
+                "Marketing",
+                "Sales",
+                "HR",
+                "Finance"
+              ]
+            }
+          ]
+        }
+      },
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "width": 218,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "id": "2",
+      "type": "action",
+      "data": {
+        "label": "Create Employee Record",
+        "type": "database",
+        "config": {
+          "operation": "insert",
+          "table": "employees",
+          "data": "{\n  \"name\": \"{{$node['New Employee Form'].json.fullName}}\",\n  \"email\": \"{{$node['New Employee Form'].json.email}}\",\n  \"position\": \"{{$node['New Employee Form'].json.position}}\",\n  \"start_date\": \"{{$node['New Employee Form'].json.startDate}}\",\n  \"department\": \"{{$node['New Employee Form'].json.department}}\",\n  \"status\": \"onboarding\"\n}"
+        }
+      },
+      "position": {
+        "x": 350,
+        "y": 200
+      },
+      "width": 249,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 350,
+        "y": 200
+      }
+    },
+    {
+      "id": "3",
+      "type": "action",
+      "data": {
+        "label": "Generate Welcome Email",
+        "type": "ai",
+        "config": {
+          "model": "gpt-3.5-turbo",
+          "prompt": "Generate a welcome email for {{$node['New Employee Form'].json.fullName}} who is joining as a {{$node['New Employee Form'].json.position}} in the {{$node['New Employee Form'].json.department}} department on {{$node['New Employee Form'].json.startDate}}. Include information about first day orientation and required documents."
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 100
+      },
+      "width": 252,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 100
+      }
+    },
+    {
+      "id": "4",
+      "type": "action",
+      "data": {
+        "label": "Send Welcome Email",
+        "type": "email",
+        "config": {
+          "to": "{{$node['New Employee Form'].json.email}}",
+          "cc": "hr@company.com",
+          "subject": "Welcome to Company - Onboarding Information",
+          "body": "{{$node['Generate Welcome Email'].json.content}}"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 100
+      },
+      "width": 221,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 100
+      }
+    },
+    {
+      "id": "5",
+      "type": "action",
+      "data": {
+        "label": "Create IT Access Request",
+        "type": "http",
+        "config": {
+          "url": "https://api.it-system.com/access-request",
+          "method": "POST",
+          "body": "{\n  \"employeeName\": \"{{$node['New Employee Form'].json.fullName}}\",\n  \"email\": \"{{$node['New Employee Form'].json.email}}\",\n  \"department\": \"{{$node['New Employee Form'].json.department}}\",\n  \"startDate\": \"{{$node['New Employee Form'].json.startDate}}\",\n  \"accessLevel\": \"standard\"\n}"
+        }
+      },
+      "position": {
+        "x": 600,
+        "y": 300
+      },
+      "width": 258,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 600,
+        "y": 300
+      }
+    },
+    {
+      "id": "6",
+      "type": "action",
+      "data": {
+        "label": "Generate Onboarding Docs",
+        "type": "document",
+        "config": {
+          "template": "onboarding_package",
+          "data": "{\n  \"employeeName\": \"{{$node['New Employee Form'].json.fullName}}\",\n  \"position\": \"{{$node['New Employee Form'].json.position}}\",\n  \"department\": \"{{$node['New Employee Form'].json.department}}\",\n  \"startDate\": \"{{$node['New Employee Form'].json.startDate}}\"\n}",
+          "format": "pdf"
+        }
+      },
+      "position": {
+        "x": 850,
+        "y": 300
+      },
+      "width": 269,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 850,
+        "y": 300
+      }
+    },
+    {
+      "id": "7",
+      "type": "action",
+      "data": {
+        "label": "Notify Department Manager",
+        "type": "email",
+        "config": {
+          "to": "{{getDepartmentManager($node['New Employee Form'].json.department)}}",
+          "subject": "New Team Member Joining - {{$node['New Employee Form'].json.fullName}}",
+          "body": "A new team member, {{$node['New Employee Form'].json.fullName}}, will be joining your department as {{$node['New Employee Form'].json.position}} on {{$node['New Employee Form'].json.startDate}}. Please prepare for their arrival."
+        }
+      },
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "width": 274,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1100,
+        "y": 200
+      }
+    },
+    {
+      "id": "8",
+      "type": "action",
+      "data": {
+        "label": "Schedule Orientation",
+        "type": "calendar",
+        "config": {
+          "event": "New Employee Orientation - {{$node['New Employee Form'].json.fullName}}",
+          "date": "{{$node['New Employee Form'].json.startDate}}",
+          "time": "09:00",
+          "duration": 120,
+          "attendees": [
+            "{{$node['New Employee Form'].json.email}}",
+            "hr@company.com",
+            "{{getDepartmentManager($node['New Employee Form'].json.department)}}"
+          ]
+        }
+      },
+      "position": {
+        "x": 1350,
+        "y": 200
+      },
+      "width": 222,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1350,
+        "y": 200
+      }
+    },
+    {
+      "id": "9",
+      "type": "action",
+      "data": {
+        "label": "Update Onboarding Status",
+        "type": "database",
+        "config": {
+          "operation": "update",
+          "table": "employees",
+          "where": "email = '{{$node['New Employee Form'].json.email}}'",
+          "data": "{\n  \"onboarding_status\": \"documents_sent\",\n  \"orientation_scheduled\": true\n}"
+        }
+      },
+      "position": {
+        "x": 1600,
+        "y": 200
+      },
+      "width": 263,
+      "height": 70,
+      "positionAbsolute": {
+        "x": 1600,
+        "y": 200
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-3",
+      "source": "2",
+      "target": "3",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e2-5",
+      "source": "2",
+      "target": "5",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e3-4",
+      "source": "3",
+      "target": "4",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e5-6",
+      "source": "5",
+      "target": "6",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e4-7",
+      "source": "4",
+      "target": "7",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e6-7",
+      "source": "6",
+      "target": "7",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e7-8",
+      "source": "7",
+      "target": "8",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    },
+    {
+      "id": "e8-9",
+      "source": "8",
+      "target": "9",
+      "markerEnd": {
+        "type": "arrowclosed"
+      }
+    }
+  ],
+  "viewport": {
+    "x": -116.97859023687806,
+    "y": 36.389607039824796,
+    "zoom": 1.0818016084732767
+  }
+}
