@@ -32,8 +32,7 @@ def simulate_workflow_exec(file):
     ╔═══════════════════════════════════════════════════════════════════════╗
           Simulating workflow execution for :{file}
     ╚═══════════════════════════════════════════════════════════════════════╝
-    
-""")  
+    """)  
     
     if file.endswith(".json"):
         with open(workflow_dir / file, "r") as file:

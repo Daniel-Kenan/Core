@@ -15,7 +15,7 @@ from workflow_engine_nodes import node_categories
 import re
 load_dotenv()
 from collections import defaultdict
-
+from workflow_engine import execute_workflow
 
 # MongoDB Configuration (Update with your actual credentials)
 MONGO_URI = os.getenv("MONGO_PUBLIC_URL")  # Replace with your MongoDB connection string
@@ -230,7 +230,12 @@ def delete_folder(folder_id):
     return jsonify({'message': 'Folder deleted'})
 
 
-
+import json
+@app.route('/workflow/run', methods=['POST'])
+def run_workflow():
+    data = request.get_json()['workflow'] #json.load( request.get_json())
+    execute_workflow(json.loads(data))
+    return jsonify({"message": "Workflow executed successfully", "data": data})
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -248,8 +253,7 @@ def login():
 
 @app.route("/exec-workflow", methods=["GET", "POST"])
 def runworkflow():
- return execute_workflow(request.json)
-
+    return execute_workflow(request.json)
 
 if __name__ == '__main__':
     print("WebSocket server started")
