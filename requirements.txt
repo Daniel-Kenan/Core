@@ -5,3 +5,5 @@ flask_socketio
 flask_cors
 flask_mail
 pymongo
+python-dotenv
+requests
